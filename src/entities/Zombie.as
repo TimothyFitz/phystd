@@ -13,6 +13,7 @@ package entities
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.geom.Rectangle;
 	
 	public class Zombie extends Entity
 	{
@@ -53,8 +54,8 @@ package entities
 			var size:b2Vec2 = Util.screenToPhysics(new b2Vec2(20,20));
 			box.SetAsBox(size.x / 2.0, size.y / 2.0);
 			
-			width = size.x * Game.PX_PER_METER;
-			height = size.y * Game.PX_PER_METER;
+			zed.width = size.x * Game.PX_PER_METER;
+			zed.height = size.y * Game.PX_PER_METER;
 			
 			var fixture_def:b2FixtureDef = new b2FixtureDef();
 			fixture_def.shape = box;
@@ -111,6 +112,15 @@ package entities
 			}
 			
 			zed.gotoAndStop(face);
+			
+			var zed_pos:Rectangle = zed.getBounds(this);
+			
+			graphics.clear();
+			if (hp < 100 && hp > 0) {
+				graphics.beginFill(0x00FF00, 0.9);
+				graphics.drawRect(zed_pos.x, zed_pos.y - 6, zed_pos.width * hp / 100.0, 4);
+				graphics.endFill();
+			}
 		}
 		
 		public function on_click(event:MouseEvent):void {
@@ -119,7 +129,7 @@ package entities
 		
 		public override function damage(amount:int):void {
 			super.damage(amount);
-			unhappy_count = 10;
+			unhappy_count = 20;
 		}
 		
 		protected override function die():void {
