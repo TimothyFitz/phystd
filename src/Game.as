@@ -25,6 +25,7 @@ package
 		public static const PX_PER_METER:Number = 30.0;
 		public static const WORLD_WIDTH:Number = 800.0;
 		public static const WORLD_HEIGHT:Number = 500.0;
+		public static const WALL_SIZE:Number = 10.0;
 		
 		public var world:b2World;
 		public var floor:b2Body;
@@ -52,7 +53,7 @@ package
 			create_walls();
 						
 			for (var i:int = 0; i < 10; i++) {
-				add(new Zombie(this, Util.screenToPhysics(new b2Vec2(Math.random()*100, 500 - Math.random()*100))));
+				add(new Zombie(this, Util.screenToPhysics(new b2Vec2(Math.random()*300, 500 - Math.random()*100))));
 			}
 			
 			add(new Tower(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 50.0, WORLD_HEIGHT - 30))));
@@ -93,18 +94,25 @@ package
 			}
 		}
 		
+		public function out_of_bounds(pos:b2Vec2, radius:Number):Boolean {
+			return pos.x - radius < WALL_SIZE / Game.PX_PER_METER || 
+				pos.x + radius > (WORLD_WIDTH - WALL_SIZE) / Game.PX_PER_METER ||
+				pos.y - radius < WALL_SIZE / Game.PX_PER_METER ||
+				pos.y + radius > (WORLD_HEIGHT - WALL_SIZE) / Game.PX_PER_METER;
+		}
+		
 		private function create_walls():void {
-			var wall_size:int = 10;
-			create_wall(0, WORLD_HEIGHT - wall_size, WORLD_WIDTH, wall_size);
-			create_wall(0, 0, WORLD_WIDTH, wall_size);
-			create_wall(0, wall_size, wall_size, WORLD_HEIGHT - wall_size * 2);
-			create_wall(WORLD_WIDTH - wall_size, wall_size, wall_size, WORLD_HEIGHT - wall_size * 2);
+			create_wall(0, WORLD_HEIGHT - WALL_SIZE, WORLD_WIDTH, WALL_SIZE);
+			create_wall(0, 0, WORLD_WIDTH, WALL_SIZE);
+			create_wall(0, WALL_SIZE, WALL_SIZE, WORLD_HEIGHT - WALL_SIZE * 2);
+			create_wall(WORLD_WIDTH - WALL_SIZE, WALL_SIZE, WALL_SIZE, WORLD_HEIGHT - WALL_SIZE * 2);
 		}
 		
 		private function create_wall(x:Number, y:Number, width:Number, height:Number):b2Body {
 			var body_def:b2BodyDef = new b2BodyDef();
 			body_def.position.x = (x + width/2) / Game.PX_PER_METER;
 			body_def.position.y = (y + height/2) / Game.PX_PER_METER;
+			body_def.userData = "BODY_DEF_WALL";
 			
 			var box:b2PolygonShape = new b2PolygonShape();
 			box.SetAsBox(width / 2.0 / Game.PX_PER_METER, height / 2.0 / Game.PX_PER_METER);
@@ -113,6 +121,7 @@ package
 			fixture_def.shape = box;
 			fixture_def.density = 1;
 			fixture_def.friction = 1;
+			fixture_def.userData = "WALL";
 
 			var body:b2Body = world.CreateBody(body_def);
 			body.CreateFixture(fixture_def);
@@ -123,6 +132,7 @@ package
 			if (dead_entities.indexOf(entity) == -1) {
 				dead_entities.push(entity);
 			}
+			entity.alive = false;
 		}
 	}
 }

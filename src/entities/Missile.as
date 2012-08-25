@@ -12,7 +12,9 @@ package entities
 	public class Missile extends Entity
 	{
 		private var target:Entity;
+		private var velocity:b2Vec2;
 		private static const SPEED:Number = 5.0;
+		private static const RADIUS:Number = 2.0;
 		public function Missile(game:Game, pos:b2Vec2, target:Entity)
 		{
 			super(game, pos);
@@ -20,13 +22,13 @@ package entities
 			this.target = target;
 			
 			var body_def:b2BodyDef = new b2BodyDef();
-			body_def.type = b2Body.b2_dynamicBody;
+			body_def.type = b2Body.b2_kinematicBody;
 			body_def.position = pos;
 			body_def.fixedRotation = true;
 			body_def.userData = this;
 			
 			var circle:b2CircleShape = new b2CircleShape();
-			circle.SetRadius(2.0 / Game.PX_PER_METER);
+			circle.SetRadius(RADIUS / Game.PX_PER_METER);
 						
 			var fixture_def:b2FixtureDef = new b2FixtureDef();
 			fixture_def.shape = circle;
@@ -42,6 +44,9 @@ package entities
 		
 		public override function step():void {
 			update_velocity();
+			if (game.out_of_bounds(body.GetWorldCenter(), RADIUS / Game.PX_PER_METER)) {
+				game.mark_dead(this);
+			}
 		}
 		
 		private function draw(color:uint):void {
@@ -52,16 +57,17 @@ package entities
 		}
 		
 		private function update_velocity():void {
-			var destination:b2Vec2 = target.body.GetWorldCenter();
-			
-			var velocity:b2Vec2 = destination.Copy();
-			velocity.Subtract(body.GetWorldCenter());
-			velocity.Normalize();
-			velocity.Multiply(SPEED);
-			
-			body.SetLinearVelocity(velocity);
+			if (target.alive) {
+				var destination:b2Vec2 = target.body.GetWorldCenter();
+				
+				var velocity:b2Vec2 = destination.Copy();
+				velocity.Subtract(body.GetWorldCenter());
+				velocity.Normalize();
+				velocity.Multiply(SPEED);
+			}
+			if (velocity) {
+				body.SetLinearVelocity(velocity);
+			}
 		}
-		
-		
 	}
 }

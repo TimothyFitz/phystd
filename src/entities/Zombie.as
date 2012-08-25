@@ -13,7 +13,10 @@ package entities
 	
 	public class Zombie extends Entity
 	{
+		private static const MAX_SPEED:Number = 5.0;
 		private var foot:TouchSensor;
+		private var step_count:int = 0;
+		private var lurch_count:int = 0;
 
 		public function Zombie(game:Game, pos:b2Vec2)
 		{
@@ -37,7 +40,7 @@ package entities
 			var fixture_def:b2FixtureDef = new b2FixtureDef();
 			fixture_def.shape = box;
 			fixture_def.density = 1.0;
-			fixture_def.friction = 0.3;
+			fixture_def.friction = 0.75;
 			fixture_def.restitution = 0.2;
 			fixture_def.userData = this;
 			
@@ -59,10 +62,17 @@ package entities
 		}
 		
 		public override function step():void {
+			step_count++;
 			if (foot.touching) {
 				draw(0x0000FF);
-				//body.GetLinearVelocity();
-				body.ApplyForce(new b2Vec2(2.0, 0.0), body.GetWorldCenter());
+				if (body.GetLinearVelocity().x < MAX_SPEED) {
+					if (step_count < 5) {
+						body.ApplyForce(new b2Vec2(Util.float_randrange(1.0, 6.0), 0.0), body.GetWorldCenter());
+					} else if (step_count > lurch_count) {
+						lurch_count = Util.randrange(15, 40);
+						step_count = 0;
+					}
+				}
 			} else {
 				draw(0xFF0000);
 			}

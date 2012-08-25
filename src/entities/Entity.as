@@ -15,6 +15,7 @@ package entities
 	{
 		public var body:b2Body;
 		public var enemy:Boolean = false;
+		public var alive:Boolean = true;
 		protected var game:Game;
 		
 		public function Entity(game:Game, pos:b2Vec2)

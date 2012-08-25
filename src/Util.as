@@ -21,6 +21,10 @@ package
 			return Math.floor(Math.random() * (high-low)) + low;
 		}
 		
+		public static function float_randrange(low:Number, high:Number):Number {
+			return Math.random() * (high-low) + low;	
+		}
+		
 		public static function randchoice(array:Array):* {
 			if (!array.length) {
 				return null;

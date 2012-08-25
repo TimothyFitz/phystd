@@ -10,8 +10,10 @@ package entities
 	
 	public class Tower extends Entity
 	{
-		private static const SHOT_COOLDOWN:int = 15;
+		private static const SHOT_COOLDOWN:int = 45;
 		private var shot_countdown:int = SHOT_COOLDOWN;
+		
+		private var range:Number = 300 / Game.PX_PER_METER;
 		
 		public function Tower(game:Game, pos:b2Vec2)
 		{
@@ -55,7 +57,7 @@ package entities
 		}
 		
 		private function find_closest_enemy():Entity {
-			var closest_dist2:Number = +Infinity;
+			var closest_dist2:Number = range*range;
 			var closest_entity:Entity = null;
 			
 			var pos:b2Vec2 = body.GetWorldCenter();
@@ -69,7 +71,7 @@ package entities
 				}
 			}
 			
-			return closest_entity;
+			return closest_entity;			
 		}
 		
 		private function shoot():Boolean {
