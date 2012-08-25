@@ -13,12 +13,16 @@ package entities
 	
 	public class ContactManager extends b2ContactListener
 	{
-		public function ContactManager()
+		private var game:Game;
+		public function ContactManager(game:Game)
 		{
 			super();
+			this.game = game;
 		}
 		
-		private function one_of(contact:b2Contact, TargetClass:Class):* {
+		private var to_die:Array = [];
+		
+		private function one_of(contact:b2Contact, TargetClass:Class):ContactMatch {
 			var uda:* = contact.GetFixtureA().GetUserData();
 			var udb:* = contact.GetFixtureB().GetUserData();
 			
@@ -26,9 +30,9 @@ package entities
 				if (uda is TargetClass && udb is TargetClass) {
 					return null;
 				} else if (uda is TargetClass) {
-					return uda;
+					return new ContactMatch(uda, udb);
 				} else {
-					return udb;
+					return new ContactMatch(udb, uda);
 				}
 			}
 			return null;
@@ -36,18 +40,29 @@ package entities
 		
 		public override function BeginContact(contact:b2Contact):void
 		{
-			var ts:TouchSensor = one_of(contact, TouchSensor);
-			if (ts) {
-				ts.touching++;
+			var match:ContactMatch = one_of(contact, TouchSensor);
+			if (match) {
+				(match.target as TouchSensor).touching++;
+			}
+			
+			match = one_of(contact, Missile);
+			if (match) {
+				if (match.other is Entity) {
+					var other:Entity = match.other;
+					if (other.enemy) {
+						game.mark_dead(match.target);
+						game.mark_dead(match.other);
+					}
+				}
 			}
 		}
 		
 		public override function EndContact(contact:b2Contact):void
 		{
-			var ts:TouchSensor = one_of(contact, TouchSensor);
-			if (ts) {
-				ts.touching--;
+			var match:ContactMatch = one_of(contact, TouchSensor);
+			if (match) {
+				(match.target as TouchSensor).touching--;
 			}
-		}		
+		}
 	}
 }

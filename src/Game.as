@@ -11,9 +11,13 @@ package
 	
 	import entities.ContactManager;
 	import entities.Entity;
+	import entities.Missile;
+	import entities.Tower;
+	import entities.Zombie;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	
 	[SWF(width="800", height="500", backgroundColor="#FFFFFF")]
 	public class Game extends Sprite
@@ -24,14 +28,18 @@ package
 		
 		public var world:b2World;
 		public var floor:b2Body;
+		public var active_entities:Array = [];
 		
-		private var zombies:Array = [];
+		private var contact_manager:ContactManager;
+		private var dead_entities:Array = [];
 		
 		public function Game()
 		{
 			var gravity:b2Vec2 = new b2Vec2(0.0, 10.0);
 			world = new b2World(gravity, true);
-			world.SetContactListener(new ContactManager());
+			
+			contact_manager = new ContactManager(this);
+			world.SetContactListener(contact_manager);
 			
 			var debugDraw:b2DebugDraw = new b2DebugDraw();
 			debugDraw.SetSprite(this);
@@ -44,10 +52,16 @@ package
 			create_walls();
 						
 			for (var i:int = 0; i < 10; i++) {
-				zombies.push(new Entity(this, new b2Vec2(Math.random()*100, Math.random()*500)));
-			}	
+				add(new Zombie(this, Util.screenToPhysics(new b2Vec2(Math.random()*100, 500 - Math.random()*100))));
+			}
+			
+			add(new Tower(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 50.0, WORLD_HEIGHT - 30))));
 			
 			addEventListener(Event.ENTER_FRAME, update, false, 0, true);
+		}		
+		
+		public function add(entity:Entity):void {
+			active_entities.push(entity);
 		}
 		
 		private function update(event:Event):void {
@@ -65,8 +79,17 @@ package
 				}
 			}
 			
-			for each (var entity:Entity in zombies) {
+			for each (var entity:Entity in active_entities) {
 				entity.step();
+			}
+			
+			if (dead_entities.length) {
+				for each (var dead:Entity in dead_entities) {
+					world.DestroyBody(dead.body);
+					removeChild(dead);
+					Util.remove(active_entities, dead);
+				}
+				dead_entities = [];
 			}
 		}
 		
@@ -77,7 +100,6 @@ package
 			create_wall(0, wall_size, wall_size, WORLD_HEIGHT - wall_size * 2);
 			create_wall(WORLD_WIDTH - wall_size, wall_size, wall_size, WORLD_HEIGHT - wall_size * 2);
 		}
-		
 		
 		private function create_wall(x:Number, y:Number, width:Number, height:Number):b2Body {
 			var body_def:b2BodyDef = new b2BodyDef();
@@ -95,6 +117,12 @@ package
 			var body:b2Body = world.CreateBody(body_def);
 			body.CreateFixture(fixture_def);
 			return body;
+		}
+		
+		public function mark_dead(entity:Entity):void {
+			if (dead_entities.indexOf(entity) == -1) {
+				dead_entities.push(entity);
+			}
 		}
 	}
 }
