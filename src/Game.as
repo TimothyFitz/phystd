@@ -62,7 +62,8 @@ package
 				add_zed();
 			}
 			
-			add(new Tower(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 50.0, WORLD_HEIGHT - 30))));
+			add(new Tower(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 10.0, WORLD_HEIGHT - 30)), Tower.PROJ_MISSILE));
+			add(new Tower(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 40.0, WORLD_HEIGHT - 30)), Tower.PROJ_CANNONBALL));
 			
 			//add(new Crate(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 100.0, WORLD_HEIGHT - 20))));
 			

@@ -3,16 +3,15 @@ package entities
 	import Box2D.Common.Math.b2Vec2;
 	
 	public class CannonBall extends Entity
-	{
+	{		
+		public static var speed:Number = 10.0;
+		public static var max_range:Number = Math.pow(speed, 2) / Game.GRAVITY_SPEED;
+		
 		public function CannonBall(game:Game, pos:b2Vec2, target:Entity)
 		{
 			super(game, pos);
 			draw(0x000000);
 			make_projectile(pos, 4/Game.PX_PER_METER);
-			
-			var speed:Number = 10.0;
-			
-			var max_distance:Number = Math.pow(speed, 2) / Game.GRAVITY_SPEED;
 			
 			var target_pos:b2Vec2 = target.body.GetWorldCenter();
 			// Thanks, http://en.wikipedia.org/wiki/Trajectory_of_a_projectile !
@@ -52,7 +51,7 @@ package entities
 		private function draw(color:uint):void {
 			graphics.clear();
 			graphics.beginFill(color, 1);
-			graphics.drawCircle(0,0,2);
+			graphics.drawCircle(0,0,4);
 			graphics.endFill();
 		}		
 	}

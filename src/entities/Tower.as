@@ -10,16 +10,37 @@ package entities
 	
 	public class Tower extends Entity
 	{
-		private static const SHOT_COOLDOWN:int = 45;
-		private var shot_countdown:int = SHOT_COOLDOWN;
+		public static const PROJ_CANNONBALL:int = 1;
+		public static const PROJ_MISSILE:int = 2;
 		
-		private var min_range:Number = 7;
-		private var max_range:Number = 10;
 		
-		public function Tower(game:Game, pos:b2Vec2)
+		private var shot_cooldown:int;
+		private var shot_cycle:int;
+		private var min_range:Number;
+		private var max_range:Number;
+		private var Projectile:Class;
+		
+		public var proj_type:int;
+		
+		public function Tower(game:Game, pos:b2Vec2, proj_type:int)
 		{
 			super(game, pos);
 			draw(0x00FF00);
+			this.proj_type = proj_type;
+			
+			if (proj_type == PROJ_CANNONBALL) {
+				min_range = 7;
+				max_range = 10;
+				shot_cycle = 90;
+				Projectile = CannonBall;
+			} else if (proj_type == PROJ_MISSILE) {
+				min_range = 3;
+				max_range = 20;
+				shot_cycle = 300;
+				Projectile = Missile;
+			}
+			
+			shot_cooldown = shot_cycle;
 			
 			make_static_rect(pos, Util.screenToPhysics(new b2Vec2(20,40)));
 		}
@@ -32,10 +53,10 @@ package entities
 		}
 		
 		public override function step():void {
-			shot_countdown--;
-			if (shot_countdown <= 0) {
+			shot_cooldown--;
+			if (shot_cooldown <= 0) {
 				if (shoot()) {
-					shot_countdown = SHOT_COOLDOWN;
+					shot_cooldown = shot_cycle;
 				}
 			}
 		}
@@ -68,8 +89,7 @@ package entities
 			var start_pos:b2Vec2 = body.GetWorldCenter().Copy();
 			start_pos.Add(Util.screenToPhysics(new b2Vec2(-20, -20)));
 			
-			//game.add(new Missile(game, start_pos, enemy));
-			game.add(new CannonBall(game, start_pos, enemy));
+			game.add(new Projectile(game, start_pos, enemy));
 			
 			return true;
 		}
