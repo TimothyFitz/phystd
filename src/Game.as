@@ -30,6 +30,7 @@ package
 		public var world:b2World;
 		public var floor:b2Body;
 		public var active_entities:Array = [];
+		public var step_count:int = 0;
 		
 		private var contact_manager:ContactManager;
 		private var dead_entities:Array = [];
@@ -53,19 +54,24 @@ package
 			create_walls();
 						
 			for (var i:int = 0; i < 10; i++) {
-				add(new Zombie(this, Util.screenToPhysics(new b2Vec2(Math.random()*300, 500 - Math.random()*100))));
+				add_zed();
 			}
 			
 			add(new Tower(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 50.0, WORLD_HEIGHT - 30))));
 			
 			addEventListener(Event.ENTER_FRAME, update, false, 0, true);
-		}		
+		}
+		
+		public function add_zed():void {
+			add(new Zombie(this, Util.screenToPhysics(new b2Vec2(Math.random()*300, 450 - Math.random()*100))));
+		}
 		
 		public function add(entity:Entity):void {
 			active_entities.push(entity);
 		}
 		
 		private function update(event:Event):void {
+			step_count++;
 			world.Step(1.0/30.0, 10, 10);
 			world.ClearForces();
 			world.DrawDebugData();
@@ -91,6 +97,10 @@ package
 					Util.remove(active_entities, dead);
 				}
 				dead_entities = [];
+			}
+			
+			if (step_count % 45 == 0) {
+				add_zed();
 			}
 		}
 		

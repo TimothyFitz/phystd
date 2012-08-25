@@ -15,6 +15,7 @@ package entities
 		private var velocity:b2Vec2;
 		private static const SPEED:Number = 5.0;
 		private static const RADIUS:Number = 2.0;
+		private static const SPLODE_FORCE:Number = 5.0;
 		public function Missile(game:Game, pos:b2Vec2, target:Entity)
 		{
 			super(game, pos);
@@ -58,16 +59,25 @@ package entities
 		
 		private function update_velocity():void {
 			if (target.alive) {
-				var destination:b2Vec2 = target.body.GetWorldCenter();
-				
-				var velocity:b2Vec2 = destination.Copy();
-				velocity.Subtract(body.GetWorldCenter());
-				velocity.Normalize();
+				var velocity:b2Vec2 = Util.normal(body.GetWorldCenter(), target.body.GetWorldCenter());
 				velocity.Multiply(SPEED);
 			}
 			if (velocity) {
 				body.SetLinearVelocity(velocity);
 			}
 		}
+		
+		public function splode():void {
+			var center:b2Vec2 = body.GetWorldCenter();
+			for each (var entity:Entity in game.active_entities) {
+				if (entity.enemy) {
+					var entity_center:b2Vec2 = entity.body.GetWorldCenter();
+					var normal:b2Vec2 = Util.normal(center, entity_center);
+					normal.Multiply(SPLODE_FORCE / Util.dist(center, entity_center));
+					entity.body.ApplyImpulse(normal, entity_center);
+				}
+			}
+			game.mark_dead(this);
+		}		
 	}
 }

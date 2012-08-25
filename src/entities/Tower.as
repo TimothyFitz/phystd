@@ -13,7 +13,7 @@ package entities
 		private static const SHOT_COOLDOWN:int = 45;
 		private var shot_countdown:int = SHOT_COOLDOWN;
 		
-		private var range:Number = 300 / Game.PX_PER_METER;
+		private var range:Number = 1000 /*300*/ / Game.PX_PER_METER;
 		
 		public function Tower(game:Game, pos:b2Vec2)
 		{
@@ -62,7 +62,7 @@ package entities
 			
 			var pos:b2Vec2 = body.GetWorldCenter();
 			for each (var entity:Entity in game.active_entities) {
-				if (!entity.enemy) continue;
+				if (!entity.enemy || !entity.alive) continue;
 				var epos:b2Vec2 = entity.body.GetWorldCenter();
 				var dist2:Number = Util.dist2(pos, epos);
 				if (dist2 < closest_dist2) {

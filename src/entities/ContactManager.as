@@ -50,8 +50,7 @@ package entities
 				if (match.other is Entity) {
 					var other:Entity = match.other;
 					if (other.enemy) {
-						game.mark_dead(match.target);
-						game.mark_dead(match.other);
+						(match.target as Missile).splode();
 					}
 				}
 			}

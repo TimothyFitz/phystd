@@ -47,6 +47,10 @@ package
 			return dx*dx + dy*dy;
 		}
 		
+		public static function dist(pt1:*, pt2:*):Number {
+			return Math.sqrt(dist2(pt1, pt2));
+		}
+		
 		public static function closest(target:DisplayObject, choices:Array):* {
 			var closest:DisplayObject = null;
 			var closest_dist:Number = +Infinity;
@@ -77,6 +81,13 @@ package
 				result.push(row);
 			}
 			return result;
+		}
+		
+		public static function normal(from:b2Vec2, to:b2Vec2):b2Vec2 {
+			var normal:b2Vec2 = to.Copy();
+			normal.Subtract(from);
+			normal.Normalize();
+			return normal;
 		}
 	}
 }
