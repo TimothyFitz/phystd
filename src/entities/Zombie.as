@@ -26,6 +26,12 @@ package entities
 		private static const HAPPY_FACE:int = 1;
 		private static const WORRIED_FACE:int = 10;
 		private static const DEAD_FACE:int = 20;
+		
+		private static const small_jump:b2Vec2 = new b2Vec2(0.25, -0.3);
+		private static const big_jump:b2Vec2 = new b2Vec2(0.1, -0.5);
+		
+		private var unhappy_count:int = 0;
+		private var death_count:int = 60;
 
 		public function Zombie(game:Game, pos:b2Vec2)	
 		{
@@ -35,6 +41,7 @@ package entities
 			addChild(zed);
 
 			enemy = true;
+			hp = 100;
 			
 			var body_def:b2BodyDef = new b2BodyDef();
 			body_def.type = b2Body.b2_dynamicBody;
@@ -68,23 +75,56 @@ package entities
 				
 		public override function step():void {
 			step_count++;
-			if (foot.touching) {
-				zed.gotoAndStop(HAPPY_FACE);
-				if (body.GetLinearVelocity().x < MAX_SPEED) {
-					if (step_count < 5) {
-						body.ApplyForce(new b2Vec2(Util.float_randrange(1.0, 6.0), 0.0), body.GetWorldCenter());
-					} else if (step_count > lurch_count) {
+			
+			if (foot.touching && alive) {
+				if (body.GetLinearVelocity().Length() < MAX_SPEED) {
+					if (step_count > lurch_count) {
+						var jump:b2Vec2 = (Math.random() < 0.05) ? big_jump : small_jump;
+						body.ApplyImpulse(
+							jump, 
+							body.GetWorldCenter());
 						lurch_count = Util.randrange(15, 40);
 						step_count = 0;
 					}
 				}
-			} else {
-				zed.gotoAndStop(WORRIED_FACE);
 			}
+			
+			var face:int = HAPPY_FACE;
+			
+			if (!foot.touching && body.GetLinearVelocity().Length() > 5) {
+				face = WORRIED_FACE;
+			}
+			
+			if (unhappy_count > 0) {
+				unhappy_count--;
+				face = WORRIED_FACE;
+			}
+			
+			if (!alive) {
+				death_count--;
+				face = DEAD_FACE;
+				if (death_count < 0) {
+					game.mark_dead(this);
+				} else if (death_count < 15) {
+					zed.alpha = (death_count % 5 < 3) ? 1 : 0
+				}
+			}
+			
+			zed.gotoAndStop(face);
 		}
 		
 		public function on_click(event:MouseEvent):void {
 			body.ApplyImpulse(new b2Vec2(-4.0, -2.0), body.GetWorldCenter());
 		}
+		
+		public override function damage(amount:int):void {
+			super.damage(amount);
+			unhappy_count = 10;
+		}
+		
+		protected override function die():void {
+			alive = false;
+		}
+			
 	}
 }

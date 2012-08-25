@@ -3,6 +3,7 @@ package entities
 	import Box2D.Common.Math.b2Vec2;
 	import Box2D.Dynamics.Contacts.b2Contact;
 	import Box2D.Dynamics.b2Body;
+	import Box2D.Dynamics.b2ContactImpulse;
 	import Box2D.Dynamics.b2ContactListener;
 	import Box2D.Dynamics.b2ContactManager;
 	import Box2D.Dynamics.b2Fixture;
@@ -59,10 +60,8 @@ package entities
 			
 			match = one_of(contact, CannonBall);
 			if (match) {
-				if (match.other == "WALL") {
-					var cb:CannonBall = match.target;
-					trace("730 - cb.x", 730 - cb.body.GetWorldCenter().x * Game.PX_PER_METER);
-					game.mark_dead(cb);
+				if (match.other == "WALL" || match.other is Entity) {
+					(match.target as CannonBall).thud(match.other);
 				}
 			}
 		}
@@ -73,6 +72,26 @@ package entities
 			if (match) {
 				(match.target as TouchSensor).touching--;
 			}
+		}
+		
+		public override function PostSolve(contact:b2Contact, impulse:b2ContactImpulse):void
+		{
+			var uda:* = contact.GetFixtureA().GetUserData();
+			var udb:* = contact.GetFixtureB().GetUserData();
+
+			if (uda is Entity && udb is Entity) {
+				var e1:Entity = uda;
+				var e2:Entity = udb;
+				
+				if (e1.enemy && e2.enemy) {
+					if (impulse.normalImpulses[0] > 1) {
+						var dmg:Number = impulse.normalImpulses[0] * 10;
+						e1.damage(dmg);
+						e2.damage(dmg);
+					}
+				}
+			}
+			
 		}
 	}
 }

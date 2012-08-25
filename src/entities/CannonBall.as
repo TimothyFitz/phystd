@@ -53,6 +53,20 @@ package entities
 			graphics.beginFill(color, 1);
 			graphics.drawCircle(0,0,4);
 			graphics.endFill();
-		}		
+		}
+		
+		public function thud(other:*):void {
+			game.mark_dead(this);
+			
+			if (other == "WALL" || !(other is Entity)) {
+				return;
+			}
+			
+			var entity:Entity = other;
+			if (entity.enemy) {
+				entity.damage(50);
+			}
+		}
+			
 	}
 }

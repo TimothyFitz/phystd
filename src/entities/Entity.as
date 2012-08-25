@@ -17,17 +17,32 @@ package entities
 		public var body:b2Body;
 		public var enemy:Boolean = false;
 		public var alive:Boolean = true;
+		public var hp:int = 0;
+		
+		
 		protected var game:Game;
 		
 		public function Entity(game:Game, pos:b2Vec2)
 		{
 			super();
 			this.game = game;
-			game.addChild(this);
 		}
 				
 		public function step():void
 		{
+		}
+		
+		public function damage(amount:int):void
+		{
+			hp -= amount;
+			if (hp <= 0) {
+				die();
+			}
+		}
+		
+		protected function die():void
+		{
+			game.mark_dead(this);
 		}
 		
 		protected function make_static_rect(pos:b2Vec2, size:b2Vec2):void

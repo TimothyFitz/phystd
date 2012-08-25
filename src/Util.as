@@ -22,7 +22,7 @@ package
 		}
 		
 		public static function float_randrange(low:Number, high:Number):Number {
-			return Math.random() * (high-low) + low;	
+			return Math.random() * (high-low) + low;
 		}
 		
 		public static function randchoice(array:Array):* {

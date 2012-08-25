@@ -17,7 +17,7 @@ package entities
 		private var heading:b2Vec2;
 		private static const SPEED:Number = 1.0/30.0;
 		private static const RADIUS:Number = 2.0;
-		private static const SPLODE_FORCE:Number = 0.1; //5.0;
+		private static const SPLODE_FORCE:Number = 2.5;
 		private var age:int = 0;
 		private var missile_sprite:MovieClip;
 		
@@ -56,7 +56,9 @@ package entities
 			var thrusters_enabled:Boolean = heading && age >= 15;
 			
 			if (thrusters_enabled) {
-				if (age == 15) { missile_sprite.gotoAndPlay(10); }
+				if (age == 15) { 
+					missile_sprite.gotoAndPlay(10);
+				}
 				body.ApplyForce(heading, body.GetWorldCenter());
 			}
 				
@@ -77,9 +79,15 @@ package entities
 			for each (var entity:Entity in game.active_entities) {
 				if (entity.enemy) {
 					var entity_center:b2Vec2 = entity.body.GetWorldCenter();
-					var normal:b2Vec2 = Util.normal(center, entity_center);
-					normal.Multiply(SPLODE_FORCE / Util.dist(center, entity_center));
-					entity.body.ApplyImpulse(normal, entity_center);
+					var dist:Number = Util.dist(center, entity_center);
+					
+					if (dist <= 1) {				
+						var normal:b2Vec2 = Util.normal(center, entity_center);
+						normal.Multiply(SPLODE_FORCE / dist);
+						entity.body.ApplyImpulse(normal, entity_center);
+						
+						entity.damage(200 * (1 - dist));
+					}
 				}
 			}
 			game.mark_dead(this);

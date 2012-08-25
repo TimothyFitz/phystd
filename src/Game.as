@@ -23,7 +23,11 @@ package
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	[SWF(width="800", height="500", backgroundColor="#FFFFFF")]
+	import ui.Battlefield;
+	
+	import ui.GameDisplay;
+	
+	[SWF(width="800", height="600", backgroundColor="#FFFFFF")]
 	public class Game extends Sprite
 	{
 		public static const PX_PER_METER:Number = 30.0;
@@ -38,8 +42,13 @@ package
 		public var active_entities:Array = [];
 		public var step_count:int = 0;
 		
+		public var cash:int = 0;
+		
+		public var battlefield:Battlefield = new Battlefield();
+		
 		private var contact_manager:ContactManager;
 		private var dead_entities:Array = [];
+		private var display:GameDisplay;
 		
 		public function Game()
 		{
@@ -48,13 +57,15 @@ package
 			contact_manager = new ContactManager(this);
 			world.SetContactListener(contact_manager);
 			
+			/*
 			var debugDraw:b2DebugDraw = new b2DebugDraw();
-			debugDraw.SetSprite(this);
+			debugDraw.SetSprite(battlefield);
 			debugDraw.SetDrawScale(PX_PER_METER);
 			debugDraw.SetFillAlpha(0.3);
 			debugDraw.SetLineThickness(1.0);
 			debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);			
 			world.SetDebugDraw(debugDraw);
+			*/
 			
 			create_walls();
 						
@@ -67,6 +78,9 @@ package
 			
 			//add(new Crate(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 100.0, WORLD_HEIGHT - 20))));
 			
+			display = new GameDisplay(this, battlefield);
+			addChild(display);
+			
 			addEventListener(Event.ENTER_FRAME, update, false, 0, true);
 		}
 		
@@ -76,6 +90,18 @@ package
 		
 		public function add(entity:Entity):void {
 			active_entities.push(entity);
+			update_body(entity.body);
+			battlefield.addChild(entity);
+		}
+		
+		public function update_body(body:b2Body):void {
+			if (body.GetUserData() is Sprite) {
+				var sprite:Sprite = body.GetUserData();
+				var pos:b2Vec2 = body.GetPosition();
+				sprite.x = pos.x * Game.PX_PER_METER;
+				sprite.y = pos.y * Game.PX_PER_METER;
+				sprite.rotation = body.GetAngle() * 180.0/Math.PI;
+			}
 		}
 		
 		private function update(event:Event):void {
@@ -85,13 +111,7 @@ package
 			world.DrawDebugData();
 			
 			for (var body:b2Body = world.GetBodyList(); body; body = body.GetNext()) {
-				if (body.GetUserData() is Sprite) {
-					var sprite:Sprite = body.GetUserData();
-					var pos:b2Vec2 = body.GetPosition();
-					sprite.x = pos.x * Game.PX_PER_METER;
-					sprite.y = pos.y * Game.PX_PER_METER;
-					sprite.rotation = body.GetAngle() * 180.0/Math.PI;
-				}
+				update_body(body);
 			}
 			
 			for each (var entity:Entity in active_entities) {
@@ -101,7 +121,7 @@ package
 			if (dead_entities.length) {
 				for each (var dead:Entity in dead_entities) {
 					world.DestroyBody(dead.body);
-					removeChild(dead);
+					battlefield.removeChild(dead);
 					Util.remove(active_entities, dead);
 				}
 				dead_entities = [];
@@ -109,7 +129,10 @@ package
 			
 			if (step_count % 45 == 0) {
 				add_zed();
+				cash += Util.randrange(10, 30);
 			}
+			
+			display.update();
 		}
 		
 		public function out_of_bounds(pos:b2Vec2, radius:Number):Boolean {
