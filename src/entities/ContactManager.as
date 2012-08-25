@@ -52,6 +52,8 @@ package entities
 					if (other.enemy) {
 						(match.target as Missile).splode();
 					}
+				} else if (match.other == "WALL") {
+					(match.target as Missile).splode();
 				}
 			}
 		}

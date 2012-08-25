@@ -12,10 +12,11 @@ package entities
 	public class Missile extends Entity
 	{
 		private var target:Entity;
-		private var velocity:b2Vec2;
-		private static const SPEED:Number = 5.0;
+		private var heading:b2Vec2;
+		private static const SPEED:Number = 1.0/30.0;
 		private static const RADIUS:Number = 2.0;
 		private static const SPLODE_FORCE:Number = 0.1; //5.0;
+		private var age:int = 0;
 		public function Missile(game:Game, pos:b2Vec2, target:Entity)
 		{
 			super(game, pos);
@@ -23,7 +24,7 @@ package entities
 			this.target = target;
 			
 			var body_def:b2BodyDef = new b2BodyDef();
-			body_def.type = b2Body.b2_kinematicBody;
+			body_def.type = b2Body.b2_dynamicBody;
 			body_def.position = pos;
 			body_def.fixedRotation = true;
 			body_def.userData = this;
@@ -33,17 +34,21 @@ package entities
 						
 			var fixture_def:b2FixtureDef = new b2FixtureDef();
 			fixture_def.shape = circle;
-			fixture_def.density = 1.0;
+			fixture_def.density = 0.1;
 			fixture_def.friction = 0.3;
 			fixture_def.restitution = 0.2;
 			fixture_def.userData = this;
 			
 			body = game.world.CreateBody(body_def);
 			body.CreateFixture(fixture_def);
+			
+			body.ApplyImpulse(new b2Vec2(0.0, -0.01), body.GetWorldCenter());
+			
 			update_velocity();
 		}
 		
 		public override function step():void {
+			age++;
 			update_velocity();
 			if (game.out_of_bounds(body.GetWorldCenter(), RADIUS / Game.PX_PER_METER)) {
 				game.mark_dead(this);
@@ -59,11 +64,15 @@ package entities
 		
 		private function update_velocity():void {
 			if (target.alive) {
-				var velocity:b2Vec2 = Util.normal(body.GetWorldCenter(), target.body.GetWorldCenter());
-				velocity.Multiply(SPEED);
+				heading = Util.normal(body.GetWorldCenter(), target.body.GetWorldCenter());
+				heading.Multiply(SPEED);
 			}
-			if (velocity) {
-				body.SetLinearVelocity(velocity);
+			if (heading && age > 15) {
+				body.ApplyForce(heading, body.GetWorldCenter());
+				
+				var thrust_up:b2Vec2 = Game.GRAVITY.Copy();
+				thrust_up.Multiply(-1 * body.GetMass());
+				body.ApplyForce(thrust_up, body.GetWorldCenter());
 			}
 		}
 		

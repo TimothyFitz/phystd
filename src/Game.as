@@ -30,6 +30,7 @@ package
 		public static const WORLD_WIDTH:Number = 800.0;
 		public static const WORLD_HEIGHT:Number = 500.0;
 		public static const WALL_SIZE:Number = 10.0;
+		public static const GRAVITY:b2Vec2 = new b2Vec2(0.0, 10.0);
 		
 		public var world:b2World;
 		public var floor:b2Body;
@@ -41,8 +42,7 @@ package
 		
 		public function Game()
 		{
-			var gravity:b2Vec2 = new b2Vec2(0.0, 10.0);
-			world = new b2World(gravity, true);
+			world = new b2World(GRAVITY, true);
 			
 			contact_manager = new ContactManager(this);
 			world.SetContactListener(contact_manager);
