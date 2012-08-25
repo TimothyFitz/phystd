@@ -9,12 +9,15 @@ package
 	import Box2D.Dynamics.b2FixtureDef;
 	import Box2D.Dynamics.b2World;
 	
+	import assets.Zed;
+	
 	import entities.ContactManager;
 	import entities.Entity;
 	import entities.Missile;
 	import entities.Tower;
 	import entities.Zombie;
 	
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;

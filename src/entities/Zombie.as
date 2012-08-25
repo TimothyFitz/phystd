@@ -8,6 +8,9 @@ package entities
 	import Box2D.Dynamics.b2FixtureDef;
 	import Box2D.Dynamics.b2World;
 	
+	import assets.Zed;
+	
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	
@@ -17,11 +20,20 @@ package entities
 		private var foot:TouchSensor;
 		private var step_count:int = 0;
 		private var lurch_count:int = 0;
+		
+		private var zed:MovieClip;
+		
+		private static const HAPPY_FACE:int = 1;
+		private static const WORRIED_FACE:int = 10;
+		private static const DEAD_FACE:int = 20;
 
-		public function Zombie(game:Game, pos:b2Vec2)
+		public function Zombie(game:Game, pos:b2Vec2)	
 		{
 			super(game, pos);
-			draw(0xFF0000);
+			zed = new Zed();
+			zed.gotoAndStop(WORRIED_FACE);
+			addChild(zed);
+
 			enemy = true;
 			
 			var body_def:b2BodyDef = new b2BodyDef();
@@ -31,7 +43,7 @@ package entities
 			body_def.userData = this;
 
 			var box:b2PolygonShape = new b2PolygonShape();
-			var size:b2Vec2 = Util.screenToPhysics(new b2Vec2(10,10));
+			var size:b2Vec2 = Util.screenToPhysics(new b2Vec2(20,20));
 			box.SetAsBox(size.x / 2.0, size.y / 2.0);
 			
 			width = size.x * Game.PX_PER_METER;
@@ -39,7 +51,7 @@ package entities
 			
 			var fixture_def:b2FixtureDef = new b2FixtureDef();
 			fixture_def.shape = box;
-			fixture_def.density = 1.0;
+			fixture_def.density = 0.25;
 			fixture_def.friction = 0.75;
 			fixture_def.restitution = 0.2;
 			fixture_def.userData = this;
@@ -53,18 +65,11 @@ package entities
 			
 			addEventListener(MouseEvent.CLICK, on_click);
 		}
-		
-		private function draw(color:uint):void {
-			graphics.clear();
-			graphics.beginFill(color, 1);
-			graphics.drawRect(-1,-1,2,2);
-			graphics.endFill();
-		}
-		
+				
 		public override function step():void {
 			step_count++;
 			if (foot.touching) {
-				draw(0x0000FF);
+				zed.gotoAndStop(HAPPY_FACE);
 				if (body.GetLinearVelocity().x < MAX_SPEED) {
 					if (step_count < 5) {
 						body.ApplyForce(new b2Vec2(Util.float_randrange(1.0, 6.0), 0.0), body.GetWorldCenter());
@@ -74,7 +79,7 @@ package entities
 					}
 				}
 			} else {
-				draw(0xFF0000);
+				zed.gotoAndStop(WORRIED_FACE);
 			}
 		}
 		
