@@ -30,7 +30,8 @@ package
 		public static const WORLD_WIDTH:Number = 800.0;
 		public static const WORLD_HEIGHT:Number = 500.0;
 		public static const WALL_SIZE:Number = 10.0;
-		public static const GRAVITY:b2Vec2 = new b2Vec2(0.0, 10.0);
+		public static const GRAVITY_SPEED:Number = 10.0;
+		public static const GRAVITY:b2Vec2 = new b2Vec2(0.0, GRAVITY_SPEED);
 		
 		public var world:b2World;
 		public var floor:b2Body;
@@ -63,7 +64,7 @@ package
 			
 			add(new Tower(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 50.0, WORLD_HEIGHT - 30))));
 			
-			add(new Crate(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 100.0, WORLD_HEIGHT - 20))));
+			//add(new Crate(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 100.0, WORLD_HEIGHT - 20))));
 			
 			addEventListener(Event.ENTER_FRAME, update, false, 0, true);
 		}

@@ -56,6 +56,15 @@ package entities
 					(match.target as Missile).splode();
 				}
 			}
+			
+			match = one_of(contact, CannonBall);
+			if (match) {
+				if (match.other == "WALL") {
+					var cb:CannonBall = match.target;
+					trace("730 - cb.x", 730 - cb.body.GetWorldCenter().x * Game.PX_PER_METER);
+					game.mark_dead(cb);
+				}
+			}
 		}
 		
 		public override function EndContact(contact:b2Contact):void

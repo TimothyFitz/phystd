@@ -23,24 +23,7 @@ package entities
 			draw(0x000000);
 			this.target = target;
 			
-			var body_def:b2BodyDef = new b2BodyDef();
-			body_def.type = b2Body.b2_dynamicBody;
-			body_def.position = pos;
-			body_def.fixedRotation = true;
-			body_def.userData = this;
-			
-			var circle:b2CircleShape = new b2CircleShape();
-			circle.SetRadius(RADIUS / Game.PX_PER_METER);
-						
-			var fixture_def:b2FixtureDef = new b2FixtureDef();
-			fixture_def.shape = circle;
-			fixture_def.density = 0.1;
-			fixture_def.friction = 0.3;
-			fixture_def.restitution = 0.2;
-			fixture_def.userData = this;
-			
-			body = game.world.CreateBody(body_def);
-			body.CreateFixture(fixture_def);
+			make_projectile(pos, 2 / Game.PX_PER_METER);
 			
 			body.ApplyImpulse(new b2Vec2(0.0, -0.01), body.GetWorldCenter());
 			
