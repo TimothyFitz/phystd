@@ -15,7 +15,7 @@ package entities
 		private var velocity:b2Vec2;
 		private static const SPEED:Number = 5.0;
 		private static const RADIUS:Number = 2.0;
-		private static const SPLODE_FORCE:Number = 5.0;
+		private static const SPLODE_FORCE:Number = 0.1; //5.0;
 		public function Missile(game:Game, pos:b2Vec2, target:Entity)
 		{
 			super(game, pos);

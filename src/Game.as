@@ -12,6 +12,7 @@ package
 	import assets.Zed;
 	
 	import entities.ContactManager;
+	import entities.Crate;
 	import entities.Entity;
 	import entities.Missile;
 	import entities.Tower;
@@ -61,6 +62,8 @@ package
 			}
 			
 			add(new Tower(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 50.0, WORLD_HEIGHT - 30))));
+			
+			add(new Crate(this, Util.screenToPhysics(new b2Vec2(WORLD_WIDTH - 100.0, WORLD_HEIGHT - 20))));
 			
 			addEventListener(Event.ENTER_FRAME, update, false, 0, true);
 		}
