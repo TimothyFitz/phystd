@@ -4,11 +4,13 @@ package
 	import Box2D.Common.Math.b2Vec2;
 	import Box2D.Dynamics.b2Body;
 	import Box2D.Dynamics.b2BodyDef;
+	import Box2D.Dynamics.b2ContactListener;
 	import Box2D.Dynamics.b2DebugDraw;
 	import Box2D.Dynamics.b2FixtureDef;
 	import Box2D.Dynamics.b2World;
 	
-	import entity.Entity;
+	import entities.ContactManager;
+	import entities.Entity;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -29,6 +31,7 @@ package
 		{
 			var gravity:b2Vec2 = new b2Vec2(0.0, 10.0);
 			world = new b2World(gravity, true);
+			world.SetContactListener(new ContactManager());
 			
 			var debugDraw:b2DebugDraw = new b2DebugDraw();
 			debugDraw.SetSprite(this);
@@ -60,7 +63,11 @@ package
 					sprite.y = pos.y * Game.PX_PER_METER;
 					sprite.rotation = body.GetAngle() * 180.0/Math.PI;
 				}
-			}			
+			}
+			
+			for each (var entity:Entity in zombies) {
+				entity.step();
+			}
 		}
 		
 		private function create_walls():void {
