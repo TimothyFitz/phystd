@@ -1,7 +1,9 @@
 package ui
 {
 	import flash.display.Sprite;
+	import flash.events.MouseEvent;
 	import flash.text.TextField;
+	import flash.text.TextFormat;
 	
 	public class GameDisplay extends Sprite
 	{
@@ -20,7 +22,25 @@ package ui
 			addChild(battlefield);
 			battlefield.y = 50;
 			
+			var b1:PurchaseButton = new PurchaseButton("testing", 50);
+			addChild(b1);
+			b1.x = 200;
+			b1.y = 2;
 			
+			b1.addEventListener(MouseEvent.CLICK, function (_:*):void {
+				game.cash -= 50;
+			});
+			
+			var format:TextFormat = new TextFormat();
+			format.size = 20;
+			format.font = "Arial";
+			
+			cash.defaultTextFormat = format;
+			cash.x = 20;
+			cash.y = 10;
+			cash.width = 180;
+			cash.height = 30;
+			cash.selectable = false;
 			
 			addChild(cash);
 			update();

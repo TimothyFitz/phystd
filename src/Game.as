@@ -42,7 +42,7 @@ package
 		public var active_entities:Array = [];
 		public var step_count:int = 0;
 		
-		public var cash:int = 0;
+		public var cash:int = 100;
 		
 		public var battlefield:Battlefield = new Battlefield();
 		
@@ -85,7 +85,7 @@ package
 		}
 		
 		public function add_zed():void {
-			add(new Zombie(this, Util.screenToPhysics(new b2Vec2(Math.random()*300, 450 - Math.random()*100))));
+			add(new Zombie(this, Util.screenToPhysics(new b2Vec2(Math.random()*300, 450 - Math.random()*50))));
 		}
 		
 		public function add(entity:Entity):void {
@@ -129,7 +129,6 @@ package
 			
 			if (step_count % 45 == 0) {
 				add_zed();
-				cash += Util.randrange(10, 30);
 			}
 			
 			display.update();
