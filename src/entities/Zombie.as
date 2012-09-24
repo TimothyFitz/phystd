@@ -46,7 +46,7 @@ package entities
 			
 			var body_def:b2BodyDef = new b2BodyDef();
 			body_def.type = b2Body.b2_dynamicBody;
-			body_def.fixedRotation = true;
+			//body_def.fixedRotation = true;
 			body_def.position = pos;
 			body_def.userData = this;
 
